@@ -1,0 +1,23 @@
+# NLP and ML Core
+numpy<2.0
+scikit-learn
+scipy
+pandas
+
+# NLP Preprocessing
+nltk
+spacy
+
+# Sentence Embedding
+sentence-transformers
+
+# PyTorch CPU version (compatible with sentence-transformers)
+torch==2.1.0+cpu
+torchvision==0.16.0+cpu
+--extra-index-url https://download.pytorch.org/whl/cpu
+
+# Optional: Additional libraries for OCR or performance
+opencv-python
+Pillow
+pdf2image
+dask
