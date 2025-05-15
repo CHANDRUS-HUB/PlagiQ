@@ -15,20 +15,18 @@ export default function AdminStatsTable() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const statsRes = await axios.get("http://localhost:7000/stats", {
-          withCredentials: true,
-        });
         const adminRes = await axios.get("http://localhost:7000/admin/activity", {
           withCredentials: true,
         });
-
-        setStats({
+          const statsRes = await axios.get("http://localhost:7000/stats", {
+          withCredentials: true,
+        });
+          setStats({
           totalChecks: statsRes.data.totalChecks ?? 0,
           totalFiles: statsRes.data.totalFiles ?? 0,
           averageMatch: statsRes.data.averageMatch ?? "0.00",
           recentChecks: statsRes.data.recentChecks ?? [],
         });
-
         setUserStats(adminRes.data.userStats ?? []);
       } catch (err) {
         console.error("Failed to fetch stats:", err);
@@ -42,7 +40,7 @@ export default function AdminStatsTable() {
   }, []);
 
   if (loading) {
-    return <p className="text-center p-6">Loading stats…</p>;
+    return <p className="text-center p-6">Loading stats…</p>;    
   }
 
   if (error) {
@@ -51,56 +49,8 @@ export default function AdminStatsTable() {
 
   return (
     <div className="p-6 bg-white rounded-xl shadow-lg space-y-8">
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="p-4 bg-indigo-50 rounded-lg text-center">
-          <h3 className="text-xl font-medium">Total Checks</h3>
-          <p className="text-3xl font-bold">{stats.totalChecks}</p>
-        </div>
-        <div className="p-4 bg-green-50 rounded-lg text-center">
-          <h3 className="text-xl font-medium">Total Files</h3>
-          <p className="text-3xl font-bold">{stats.totalFiles}</p>
-        </div>
-        <div className="p-4 bg-yellow-50 rounded-lg text-center">
-          <h3 className="text-xl font-medium">Avg. Match</h3>
-          <p className="text-3xl font-bold">{stats.averageMatch}%</p>
-        </div>
-      </div>
-
-      {/* Recent Checks Table */}
-      <div className="overflow-x-auto">
-        <h2 className="text-2xl font-semibold mb-4">Recent File Checks</h2>
-        <table className="min-w-full table-auto border-collapse">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="px-4 py-2 border">ID</th>
-              <th className="px-4 py-2 border">Files Compared</th>
-              <th className="px-4 py-2 border">Match %</th>
-              <th className="px-4 py-2 border">User Name</th>
-              <th className="px-4 py-2 border">Checked At</th>
-            </tr>
-          </thead>
-          <tbody>
-            {stats.recentChecks.map((check) => (
-              <tr key={check.id} className="hover:bg-gray-50">
-                <td className="px-4 py-2 border text-center">{check.id}</td>
-                <td className="px-4 py-2 border">{check.fileName}</td>
-                <td className="px-4 py-2 border text-center">
-                  {check.plagiarismPercentage}%
-                </td>
-                <td className="px-4 py-2 border text-center">
-                  {check.userName}
-                </td>
-                <td className="px-4 py-2 border text-center">
-                  {new Date(check.createdAt).toLocaleString()}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* User Activity Table */}
+      <h1 className="text-3xl font-bold mb-4">Admin Dashboard</h1>
+      
       <div className="overflow-x-auto">
         <h2 className="text-2xl font-semibold mb-4">User Activity Summary</h2>
         <table className="min-w-full table-auto border-collapse">

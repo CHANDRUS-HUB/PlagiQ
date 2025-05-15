@@ -6,11 +6,9 @@ import { AuthProvider } from "./components/Authcontext";
 function App() {
   return (
     <div className="min-h-screen bg-gray-50">
-<AuthProvider>
+      <AuthProvider>
       <Navbar />
-
       <Toaster position="top-right" reverseOrder={false} />
-
       <Outlet />
       </AuthProvider>
     </div>

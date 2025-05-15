@@ -13,10 +13,12 @@ import Home from './pages/home';
 import ForgotPassword from './pages/ForgotPassword';
 import Compare from './pages/compare';
 import Dashboard from './pages/dashboard';
-import AdminStatsTable from './pages/AdminStatsTable';
+import AdminStatsTable from './pages/adminStatsTable';
 import PlagarismChecker from './pages/plagarismcheck';
 import ProtectedUserRoute from './components/ProtectedUserRoute';
-import { AuthProvider } from './components/Authcontext'; 
+import ProtectedAdminRoute from './components/ProtectedAdminRoute';
+
+import { AuthProvider } from './components/Authcontext';
 
 const router = createBrowserRouter([
   {
@@ -45,11 +47,11 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "AdminStats",
+        path: "adminstats", 
         element: (
-          <ProtectedUserRoute>
+          <ProtectedAdminRoute>
             <AdminStatsTable />
-          </ProtectedUserRoute>
+          </ProtectedAdminRoute>
         ),
       },
       {

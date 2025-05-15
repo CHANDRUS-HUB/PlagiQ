@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 
-export default function ProtectedUserRoute({ children }) {
+export default function ProtectedAdminRoute({ children }) {
   const [loading, setLoading] = useState(true);
   const [isAllowed, setIsAllowed] = useState(false);
 
@@ -12,11 +12,11 @@ export default function ProtectedUserRoute({ children }) {
           credentials: "include",
         });
         const data = await res.json();
-        if (data.authenticated && data.user?.role === "user") {
+        if (data.authenticated && data.user?.role === "admin") {
           setIsAllowed(true);
         }
       } catch (err) {
-        console.error("User route auth error", err);
+        console.error("Admin route auth error", err);
       }
       setLoading(false);
     };

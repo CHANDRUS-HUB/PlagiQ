@@ -1,4 +1,4 @@
-const { User, PlagiarismHistory,UserLog } = require('../models');
+const { User, PlagiarismHistory, UserLog } = require('../models');
 const { Op } = require("sequelize");
 
 const getUserDashboardStats = async (req, res) => {
@@ -39,7 +39,6 @@ const getAdminDashboardStats = async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
 
-    // 1) Build optional date-range filter
     const where = {};
     if (startDate && endDate) {
       where.created_at = {
@@ -47,13 +46,12 @@ const getAdminDashboardStats = async (req, res) => {
       };
     }
 
-    // 2) Fetch logs and include User info (username + email)
     const logs = await UserLog.findAll({
       where,
       include: [
         {
           model: User,
-          as: 'user',
+          as: 'user', // Ensure this matches your association
           attributes: ['username', 'email'],
         },
       ],
@@ -62,14 +60,15 @@ const getAdminDashboardStats = async (req, res) => {
       nest: true,
     });
 
-    // 3) Aggregate stats per user
+    // ✅ FIXED AGGREGATION
     const statsMap = {};
     logs.forEach((log) => {
+      const userId = log.userId;
       const userName = log.user?.username || 'Unknown';
       const userEmail = log.user?.email || 'Unknown';
 
-      if (!statsMap[userName]) {
-        statsMap[userName] = {
+      if (!statsMap[userId]) {
+        statsMap[userId] = {
           userName,
           email: userEmail,
           logins: 0,
@@ -77,19 +76,21 @@ const getAdminDashboardStats = async (req, res) => {
         };
       }
 
-      if (log.action === 'login') statsMap[userName].logins++;
-      if (log.action === 'file_check') statsMap[userName].fileChecks++;
+      if (log.action === 'login') statsMap[userId].logins++;
+      if (log.action === 'file_check') statsMap[userId].fileChecks++;
     });
 
-    // 4) Return as array
-    const userStats = Object.values(statsMap);
-
+    // 4) Filter out Admin user
+    const userStats = Object.values(statsMap).filter(
+      (user) => user.email !== 'chandrumani72@gmail.com' // <-- change if needed
+    );
     return res.json({ userStats });
   } catch (err) {
     console.error('Error in getAdminDashboardStats:', err);
     return res.status(500).json({ error: 'Failed to fetch admin stats' });
   }
 };
+
 
 
 
@@ -117,8 +118,5 @@ const plagiarismResultHistory = async (req, res) => {
     res.status(500).json({ errorMessage: 'Error saving plagiarism result' });
   }
 };
-
-
-
 
 module.exports = { getAdminDashboardStats, getUserDashboardStats, plagiarismResultHistory };

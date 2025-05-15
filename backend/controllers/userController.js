@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const {User} = require("../models");
+const { User, UserLog } = require("../models");
 const nodemailer = require("nodemailer");
 const { validateUserInput } = require("./utils/validators");
 
@@ -134,6 +134,14 @@ const loginUser = async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ message: "Invalid password" });
 
+        if (user.role !== 'admin') {
+            await UserLog.create({
+                userId: user.id,
+                action: 'login',
+                metadata: {},
+                createdAt: new Date(), // use camelCase since your model uses that
+            });
+        }
         const token = generateToken(user);
         res.cookie("token", token, {
             httpOnly: true,
