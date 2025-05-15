@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../components/Authcontext"; // Adjust path as needed
 
 const navLinks = [
   { path: "/home", label: "Home" },
@@ -14,44 +15,26 @@ const userLinks = [
 ];
 
 const adminLinks = [
-  { path: "/admin-dashboard", label: "Admin Dashboard" },  // For Admin
+  { path: "/AdminStats", label: "Admin Dashboard" },
 ];
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userRole, setUserRole] = useState("");  // Track user role
+  const { isAuthenticated, userRole, logout } = useAuth();
   const navigate = useNavigate();
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await fetch("http://localhost:7000/check-auth", {
-          credentials: "include",
-        });
-        const data = await res.json();
-        if (data.authenticated) {
-          setIsAuthenticated(true);
-          setUserRole(data.user?.role); 
-        } else {
-          setIsAuthenticated(false);
-        }
-      } catch (err) {
-        console.error("Auth check failed", err);
-        setIsAuthenticated(false);
-      }
-    };
-    checkAuth();
-  }, []);
-
   const handleLogout = () => {
-    document.cookie = "token=; Max-Age=0; path=/;"; // Clear cookie
-    setIsAuthenticated(false);
-    setUserRole("");  // Reset role
-    navigate("/signin");  // Redirect to sign-in page
+    logout();
+    navigate("/signin");
   };
+
+  const activeLinks = !isAuthenticated
+    ? navLinks
+    : userRole === "admin"
+    ? adminLinks
+    : userLinks;
 
   return (
     <nav className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 shadow-lg">
@@ -62,8 +45,7 @@ export default function Navbar() {
           </Link>
 
           <div className="hidden md:flex space-x-6 items-center">
-            {/* Display public links if not authenticated */}
-            {(!isAuthenticated ? navLinks : userRole === "admin" ? adminLinks : userLinks).map((link) => (
+            {activeLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
@@ -72,8 +54,7 @@ export default function Navbar() {
                 {link.label}
               </Link>
             ))}
-            
-            {/* Show logout button only when authenticated */}
+
             {isAuthenticated && (
               <button
                 onClick={handleLogout}
@@ -84,7 +65,7 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Mobile Menu */}
+          {/* Mobile Menu Toggle */}
           <div className="md:hidden">
             <button
               onClick={toggleMenu}
@@ -92,11 +73,11 @@ export default function Navbar() {
               aria-label="Toggle menu"
             >
               {isOpen ? (
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-6 w-6" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               ) : (
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-6 w-6" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               )}
@@ -104,10 +85,10 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Mobile Menu Dropdown */}
+        {/* Mobile Dropdown */}
         {isOpen && (
           <div className="md:hidden mt-2 bg-white rounded shadow-md p-4 space-y-2">
-            {(!isAuthenticated ? navLinks : userRole === "admin" ? adminLinks : userLinks).map((link) => (
+            {activeLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}

@@ -15,7 +15,8 @@ import Compare from './pages/compare';
 import Dashboard from './pages/dashboard';
 import AdminStatsTable from './pages/AdminStatsTable';
 import PlagarismChecker from './pages/plagarismcheck';
-import ProtectedUserRoute from './components/ProtectedUserRoute'; // ⬅️ Import route guard
+import ProtectedUserRoute from './components/ProtectedUserRoute';
+import { AuthProvider } from './components/Authcontext'; 
 
 const router = createBrowserRouter([
   {
@@ -27,7 +28,6 @@ const router = createBrowserRouter([
       { path: "signin", element: <Login /> },
       { path: "signup", element: <Register /> },
       { path: "forgot-password", element: <ForgotPassword /> },
-
       {
         path: "dashboard",
         element: (
@@ -66,6 +66,8 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   </React.StrictMode>,
 );

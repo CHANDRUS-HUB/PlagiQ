@@ -1,6 +1,5 @@
-const { User, PlagiarismHistory } = require('../models');
+const { User, PlagiarismHistory,UserLog } = require('../models');
 const { Op } = require("sequelize");
-const { UserLog } = require("../models/userLogs");
 
 const getUserDashboardStats = async (req, res) => {
   try {
@@ -34,43 +33,55 @@ const getUserDashboardStats = async (req, res) => {
 };
 
 
+
+
 const getAdminDashboardStats = async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
 
-    // 1) Build optional date‐range filter
+    // 1) Build optional date-range filter
     const where = {};
     if (startDate && endDate) {
       where.created_at = {
-        [Op.between]: [new Date(startDate), new Date(endDate)]
+        [Op.between]: [new Date(startDate), new Date(endDate)],
       };
     }
 
-    // 2) Fetch logs + join User (to get name & email)
+    // 2) Fetch logs and include User info (username + email)
     const logs = await UserLog.findAll({
       where,
-      include: [{
-        model: User,
-        as: 'user',               // match your UserLog.belongsTo alias
-        attributes: ['name', 'email']
-      }],
+      include: [
+        {
+          model: User,
+          as: 'user',
+          attributes: ['username', 'email'],
+        },
+      ],
       order: [['created_at', 'DESC']],
       raw: true,
-      nest: true
+      nest: true,
     });
 
-    // 3) Tally per‐user stats
+    // 3) Aggregate stats per user
     const statsMap = {};
-    logs.forEach(log => {
-      const uname = log.user.name;
-      if (!statsMap[uname]) {
-        statsMap[uname] = { userName: uname, email: log.user.email, logins: 0, fileChecks: 0 };
+    logs.forEach((log) => {
+      const userName = log.user?.username || 'Unknown';
+      const userEmail = log.user?.email || 'Unknown';
+
+      if (!statsMap[userName]) {
+        statsMap[userName] = {
+          userName,
+          email: userEmail,
+          logins: 0,
+          fileChecks: 0,
+        };
       }
-      if (log.action === 'login') statsMap[uname].logins++;
-      if (log.action === 'file_check') statsMap[uname].fileChecks++;
+
+      if (log.action === 'login') statsMap[userName].logins++;
+      if (log.action === 'file_check') statsMap[userName].fileChecks++;
     });
 
-    // 4) Convert to array
+    // 4) Return as array
     const userStats = Object.values(statsMap);
 
     return res.json({ userStats });
@@ -79,6 +90,8 @@ const getAdminDashboardStats = async (req, res) => {
     return res.status(500).json({ error: 'Failed to fetch admin stats' });
   }
 };
+
+
 
 const plagiarismResultHistory = async (req, res) => {
   try {

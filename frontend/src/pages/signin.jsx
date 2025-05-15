@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +7,7 @@ import { Button } from "../components/ui/button";
 import { Label } from "../components/ui/label";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import img2 from "../assets/img2.jpg";
+import { useAuth } from "../components/Authcontext";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -14,6 +15,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { checkAuth } = useAuth();
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
@@ -40,9 +42,15 @@ export default function Login() {
         toast.error(data.message || "Login failed");
       } else {
         toast.success("Login successful!");
-        console.log("Login successful:", data);
-        navigate("/dashboard");
+        await checkAuth();
+
+        if (data.user?.role === "admin") {
+          navigate("/AdminStats");
+        } else {
+          navigate("/dashboard");
+        }
       }
+
     } catch (err) {
       setError("Something went wrong. Please try again.");
       toast.error("Something went wrong. Please try again.");
