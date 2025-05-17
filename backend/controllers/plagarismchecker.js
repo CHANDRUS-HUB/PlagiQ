@@ -96,4 +96,18 @@ const checkPlagiarism = async (req, res) => {
   }
 };
 
-module.exports = { checkPlagiarism };
+const deleteHistoryEntry = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deletedCount = await PlagiarismHistory.destroy({ where: { id } });
+    if (deletedCount === 0) {
+      return res.status(404).json({ error: 'History entry not found.' });
+    }
+    return res.json({ message: 'History entry deleted successfully.' });
+  } catch (err) {
+    console.error('Error deleting history entry:', err);
+    return res.status(500).json({ error: 'Failed to delete history entry.' });
+  }
+};
+
+module.exports = { checkPlagiarism, deleteHistoryEntry };

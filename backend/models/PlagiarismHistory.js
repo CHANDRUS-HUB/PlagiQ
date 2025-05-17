@@ -28,15 +28,15 @@ module.exports = (sequelize, DataTypes) => {
         key: 'id',
       },
     },
-    // match your `created_at` column
+    
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
       field: 'created_at',
     },
   }, {
-    tableName: 'plagiarism_history',  // your exact table name
-    timestamps: false                 // since you're managing createdAt yourself
+    tableName: 'plagiarism_history', 
+    timestamps: false                 
   });
 
   PlagiarismHistory.associate = (models) => {

@@ -2,6 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const plagiarismController = require('../controllers/plagarismchecker');
+const { deleteHistoryEntry } = require('../controllers/plagarismchecker');
 const compareController = require("../controllers/compareFiles");
 const  protectRoute  = require('../middleware/protectRoute');
 const memoryUpload = multer({ storage: multer.memoryStorage() });
@@ -33,7 +34,7 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({ 
   storage: storage,
-  limits: { fileSize: 1 * 1024 * 1024 }, // 1 MB limit
+  limits: { fileSize: 2 * 1024 * 1024 }, // 1 MB limit
   fileFilter: fileFilter
 });
 
@@ -54,5 +55,9 @@ router.post(
   protectRoute,
   plagiarismResultHistory
 );
-
+router.delete(
+  '/delete-plagiarism-result/:id',
+  protectRoute,
+  deleteHistoryEntry
+);
 module.exports = router;

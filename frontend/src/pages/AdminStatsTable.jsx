@@ -11,7 +11,7 @@ export default function AdminStatsTable() {
   const [userStats, setUserStats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
+   let [intervalId,] = useState(null);
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -36,7 +36,9 @@ export default function AdminStatsTable() {
       }
     };
 
-    fetchStats();
+      fetchStats(); 
+  intervalId = setInterval(fetchStats, 3000); 
+  return () => clearInterval(intervalId);
   }, []);
 
   if (loading) {

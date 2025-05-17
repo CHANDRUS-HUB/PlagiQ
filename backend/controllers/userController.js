@@ -139,7 +139,7 @@ const loginUser = async (req, res) => {
                 userId: user.id,
                 action: 'login',
                 metadata: {},
-                createdAt: new Date(), // use camelCase since your model uses that
+                createdAt: new Date(), 
             });
         }
         const token = generateToken(user);

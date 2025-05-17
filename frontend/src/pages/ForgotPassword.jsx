@@ -9,11 +9,11 @@ export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [step, setStep] = useState(1); 
+  const [step, setStep] = useState(1);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const handleRequestOtp = async (e) => {    
+  const handleRequestOtp = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
@@ -52,7 +52,7 @@ export default function ForgotPassword() {
       const data = await response.json();
       if (response.ok) {
         setSuccess(data.message);
-        setStep(1); 
+        setStep(1);
         setEmail("");
         setOtp("");
         setNewPassword("");
@@ -65,20 +65,35 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-indigo-100 via-purple-100 to-pink-100">
-      <Card className="w-[500px] shadow-2xl rounded-2xl bg-white">
-        <CardHeader>
-          <CardTitle className="text-3xl font-bold text-center text-gray-800">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-tr from-purple-200 via-pink-100 to-indigo-100 p-4">
+      <Card className="w-full max-w-md rounded-3xl shadow-xl backdrop-blur bg-white/80 border border-white/30">
+        <CardHeader className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-t-3xl p-6">
+          <CardTitle className="text-2xl font-bold text-center">
             {step === 1 ? "Forgot Password" : "Reset Password"}
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-          {success && <p className="text-green-500 text-sm">{success}</p>}
+        <CardContent className="p-6 space-y-6">
+          {error && (
+            <div className="text-sm bg-red-100 text-red-600 px-4 py-2 rounded-md border border-red-200">
+              {error}
+            </div>
+          )}
+          {success && (
+            <div className="text-sm bg-green-100 text-green-700 px-4 py-2 rounded-md border border-green-200">
+              {success}
+            </div>
+          )}
+
+          {/* Step Indicator */}
+          <div className="flex justify-center items-center gap-2 mb-4">
+            <div className={`h-2 w-10 rounded-full ${step === 1 ? "bg-indigo-500" : "bg-indigo-200"}`} />
+            <div className={`h-2 w-10 rounded-full ${step === 2 ? "bg-indigo-500" : "bg-indigo-200"}`} />
+          </div>
+
           {step === 1 ? (
-            <form className="space-y-6" onSubmit={handleRequestOtp}>
+            <form onSubmit={handleRequestOtp} className="space-y-4">
               <div>
-                <Label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                <Label htmlFor="email" className="text-gray-700 font-medium">
                   Email Address
                 </Label>
                 <Input
@@ -87,20 +102,20 @@ export default function ForgotPassword() {
                   placeholder="you@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  className="mt-1 w-full rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                 />
               </div>
               <Button
                 type="submit"
-                className="w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-md shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-all shadow"
               >
                 Request OTP
               </Button>
             </form>
           ) : (
-            <form className="space-y-6" onSubmit={handleResetPassword}>
+            <form onSubmit={handleResetPassword} className="space-y-4">
               <div>
-                <Label htmlFor="otp" className="block text-sm font-medium text-gray-700">
+                <Label htmlFor="otp" className="text-gray-700 font-medium">
                   OTP
                 </Label>
                 <Input
@@ -109,11 +124,11 @@ export default function ForgotPassword() {
                   placeholder="Enter OTP"
                   value={otp}
                   onChange={(e) => setOtp(e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  className="mt-1 w-full rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                 />
               </div>
               <div>
-                <Label htmlFor="newPassword" className="block text-sm font-medium text-gray-700">
+                <Label htmlFor="newPassword" className="text-gray-700 font-medium">
                   New Password
                 </Label>
                 <Input
@@ -122,23 +137,24 @@ export default function ForgotPassword() {
                   placeholder="Enter new password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  className="mt-1 w-full rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                 />
               </div>
               <Button
                 type="submit"
-                className="w-full py-2 px-4 bg-indigo-600 text-white font-semibold rounded-md shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-all shadow"
               >
                 Reset Password
               </Button>
             </form>
           )}
-          <div className="mt-6 text-center">
+
+          <div className="pt-4 text-center">
             <Link
               to="/signin"
-              className="text-sm font-medium text-indigo-600 hover:text-indigo-800"
+              className="text-sm text-indigo-600 hover:text-indigo-800 font-medium transition"
             >
-              Back to Sign In
+              &larr; Back to Sign In
             </Link>
           </div>
         </CardContent>

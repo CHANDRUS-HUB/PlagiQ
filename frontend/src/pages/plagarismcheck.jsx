@@ -11,14 +11,35 @@ export default function PlagiarismCheck() {
   const navigate = useNavigate();
 
   const handleCheck = async () => {
-    if (!file) {
-      setError("Please upload a file first");
+  if (!file) {
+    setError("Please upload a file first");
+    return;
+  }
+
+  setLoading(true);
+  setError(null);
+  setResult(null);
+
+  const reader = new FileReader();
+
+  reader.onload = async (e) => {
+    const content = e.target.result;
+
+    // Check if content seems like a question bank
+    const questionIndicators = [
+      "What", "Why", "How", "When", "Where", "Who",
+      "Which", "Whom", "Whose", "Q:", "Q.", "?", "A.", "B.", "C.", "D."
+    ];
+
+    const hasQuestionContent = questionIndicators.some(word =>
+      content.includes(word)
+    );
+
+    if (!hasQuestionContent) {
+      setError("Uploaded file does not appear to be a question bank.");
+      setLoading(false);
       return;
     }
-
-    setLoading(true);
-    setError(null);
-    setResult(null);
 
     const formData = new FormData();
     formData.append("file", file);
@@ -40,6 +61,7 @@ export default function PlagiarismCheck() {
         setLoading(false);
         return;
       }
+
       const data = await response.json();
       setResult({
         fileName: data.fileName,
@@ -56,6 +78,9 @@ export default function PlagiarismCheck() {
       setLoading(false);
     }
   };
+
+  reader.readAsText(file); 
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-300 px-4">
