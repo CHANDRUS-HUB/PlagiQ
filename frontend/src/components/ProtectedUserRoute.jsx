@@ -12,9 +12,7 @@ export default function ProtectedUserRoute({ children }) {
     return <Navigate to="/signin" replace />;
   }
 
-  if (userRole !== "user") {
-    return <Navigate to="/signin" replace />;
-  }
+ 
 
   return children;
 }

@@ -27,9 +27,6 @@ export default function PlagiarismCheck() {
       const token = localStorage.getItem("authToken");
       const response = await fetch("http://localhost:7000/api/check-plagiarism", {
         method: "POST",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-        },
         credentials: "include",
         body: formData,
       });

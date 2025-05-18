@@ -7,10 +7,7 @@ export default function ProtectedAdminRoute({ children }) {
   if (isAuthenticated === false) {
     return <Navigate to="/signin" replace />;
   }
-
-  if (userRole !== "admin") {
-    return <Navigate to="/signin" replace />;
-  }
+  
 
   return children;
 }

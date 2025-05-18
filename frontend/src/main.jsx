@@ -4,6 +4,7 @@ import './index.css';
 import {
   createBrowserRouter,
   RouterProvider,
+  Navigate,
 } from "react-router-dom";
 
 import App from './App';
@@ -18,18 +19,59 @@ import PlagarismChecker from './pages/plagarismcheck';
 import ProtectedUserRoute from './components/ProtectedUserRoute';
 import ProtectedAdminRoute from './components/ProtectedAdminRoute';
 
-import { AuthProvider } from './components/Authcontext';
+import { AuthProvider, useAuth } from './components/Authcontext';
+
+const GuestRoute = ({ children }) => {
+  const { currentUser } = useAuth();
+  
+  if (currentUser) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  
+  return children;
+};
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
     children: [
-      { index: true, element: <Login /> },
-      { path: "home", element: <Home /> },
-      { path: "signin", element: <Login /> },
-      { path: "signup", element: <Register /> },
-      { path: "forgot-password", element: <ForgotPassword /> },
+      { 
+        index: true, 
+        element: (
+          <GuestRoute>
+            <Login />
+          </GuestRoute>
+        ) 
+      },
+      { 
+        path: "home", 
+        element: <Home /> 
+      },
+      { 
+        path: "signin", 
+        element: (
+          <GuestRoute>
+            <Login />
+          </GuestRoute>
+        ) 
+      },
+      { 
+        path: "signup", 
+        element: (
+          <GuestRoute>
+            <Register />
+          </GuestRoute>
+        ) 
+      },
+      { 
+        path: "forgot-password", 
+        element: (
+          <GuestRoute>
+            <ForgotPassword />
+          </GuestRoute>
+        ) 
+      },
       {
         path: "dashboard",
         element: (
@@ -68,8 +110,8 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    
+    <AuthProvider>
       <RouterProvider router={router} />
-    
+    </AuthProvider>
   </React.StrictMode>,
 );

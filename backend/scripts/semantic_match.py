@@ -62,7 +62,7 @@ def process_docx(file_path):
 
 try:
     model = SentenceTransformer("all-MiniLM-L6-v2")
-    file_path = sys.argv[1]  # File path
+    file_path = sys.argv[1] 
     file_type = sys.argv[2]  # File type (PDF, DOCX, TXT)
     file_content = sys.argv[3]  # Raw file content
 

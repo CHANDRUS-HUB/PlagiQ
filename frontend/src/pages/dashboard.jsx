@@ -29,7 +29,6 @@ export default function Dashboard() {
     const { id, idx } = pendingDelete;
     try {
       const res = await axios.delete(`http://localhost:7000/api/delete-plagiarism-result/${id}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         withCredentials: true,
       });
 
