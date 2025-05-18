@@ -8,6 +8,7 @@ const getUserDashboardStats = async (req, res) => {
     const totalChecks = await PlagiarismHistory.count({ where: { userId } });
 
     const allHistory = await PlagiarismHistory.findAll({ where: { userId } });
+console.log("stas fetching");
 
     const averageMatch =
       allHistory.length > 0

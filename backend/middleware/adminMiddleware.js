@@ -17,7 +17,6 @@ const adminOnly = async (req, res, next) => {
       return res.status(403).json({ error: 'Permission denied: Admins only' });
     }
 
-    // User is admin, continue
     next();
   } catch (err) {
     console.error('Admin middleware error:', err);

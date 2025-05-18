@@ -11,35 +11,14 @@ export default function PlagiarismCheck() {
   const navigate = useNavigate();
 
   const handleCheck = async () => {
-  if (!file) {
-    setError("Please upload a file first");
-    return;
-  }
-
-  setLoading(true);
-  setError(null);
-  setResult(null);
-
-  const reader = new FileReader();
-
-  reader.onload = async (e) => {
-    const content = e.target.result;
-
-    // Check if content seems like a question bank
-    const questionIndicators = [
-      "What", "Why", "How", "When", "Where", "Who",
-      "Which", "Whom", "Whose", "Q:", "Q.", "?", "A.", "B.", "C.", "D."
-    ];
-
-    const hasQuestionContent = questionIndicators.some(word =>
-      content.includes(word)
-    );
-
-    if (!hasQuestionContent) {
-      setError("Uploaded file does not appear to be a question bank.");
-      setLoading(false);
+    if (!file) {
+      setError("Please upload a file first");
       return;
     }
+
+    setLoading(true);
+    setError(null);
+    setResult(null);
 
     const formData = new FormData();
     formData.append("file", file);
@@ -55,14 +34,14 @@ export default function PlagiarismCheck() {
         body: formData,
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        setError(errorData.errorMessage || "Error during plagiarism check");
+        setError(data.message || "Error during plagiarism check");
         setLoading(false);
         return;
       }
 
-      const data = await response.json();
       setResult({
         fileName: data.fileName,
         date: data.date,
@@ -79,12 +58,9 @@ export default function PlagiarismCheck() {
     }
   };
 
-  reader.readAsText(file); 
-};
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-300 px-4">
-      <h1 className="text-4xl font-bold text-center mb-10 text-gray-800">
+      <h1 className="text-4xl font-bold text-center mb-10 mt-2 text-gray-800">
         Single File Plagiarism Check
       </h1>
 
@@ -113,7 +89,7 @@ export default function PlagiarismCheck() {
             <p>
               <strong>Date:</strong>{" "}
               {new Date(result.date).toLocaleDateString()}
-            </p>           
+            </p>
             <p><strong>Plagiarism Match:</strong> <span className="text-indigo-600 font-bold">{result.percentage}%</span></p>
             <p><strong>Status:</strong> {result.percentage > 30 ? "High Risk" : "Low Risk"}</p>
           </div>
@@ -126,12 +102,8 @@ export default function PlagiarismCheck() {
               <ul className="space-y-4">
                 {result.duplicates.map((q, i) => (
                   <li key={i} className="bg-gray-100 border border-gray-300 rounded-lg p-4">
-                    <p className="mb-2">
-                      <strong>Question 1:</strong> {q.q1}
-                    </p>
-                    <p className="mb-2 whitespace-pre-line">
-                      <p><strong>Question 2:</strong> {q.q2}</p>
-                    </p>
+                    <p><strong>Question 1:</strong> {q.q1}</p>
+                    <p><strong>Question 2:</strong> {q.q2}</p>
                     <p>
                       <strong>Similarity Score:</strong>{" "}
                       <span className={q.score > 0.8 ? "text-red-600 font-bold" : "text-green-600"}>

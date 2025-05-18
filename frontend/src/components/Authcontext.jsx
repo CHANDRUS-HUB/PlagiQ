@@ -3,8 +3,9 @@ import { createContext, useContext, useState, useEffect } from "react";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(null);
   const [userRole, setUserRole] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   const checkAuth = async () => {
     try {
@@ -22,6 +23,8 @@ export const AuthProvider = ({ children }) => {
     } catch {
       setIsAuthenticated(false);
       setUserRole("");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -29,16 +32,22 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   }, []);
 
-  const logout = () => {
-    document.cookie = "token=; Max-Age=0; path=/;";
+  const logout = async () => {
+    try {
+      await fetch("http://localhost:7000/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch (err) {
+      console.error("Logout request failed:", err);
+    }
     setIsAuthenticated(false);
     setUserRole("");
   };
 
+
   return (
-    <AuthContext.Provider
-      value={{ isAuthenticated, userRole, checkAuth, logout }}
-    >
+    <AuthContext.Provider value={{ isAuthenticated, userRole, checkAuth, logout }}>
       {children}
     </AuthContext.Provider>
   );

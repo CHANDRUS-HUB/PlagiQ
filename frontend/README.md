@@ -45,3 +45,9 @@ CREATE TABLE user_logs (
   metadata JSONB,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+
+
+--project run comments
+
+1.uvicorn main:app --reload --port 8000

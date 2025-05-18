@@ -145,8 +145,8 @@ const loginUser = async (req, res) => {
         const token = generateToken(user);
         res.cookie("token", token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "Strict",
+            secure:  process.env.NODE_ENV === "production",
+            sameSite: "Lax",
             maxAge: 30 * 60 * 1000,
         });
 
@@ -218,13 +218,17 @@ const logoutUser = (req, res) => {
     res.clearCookie("token", {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'Strict',
+        sameSite: 'Lax',  // ⚠️ Must match how it was set
+        path: '/',        // ⚠️ Critical: Default path is "/", make sure it's included
     });
     res.json({ message: "Logout successful" });
 };
 
+
 // Check Authentication
 const checkAuth = (req, res) => {
+      console.log("🔍 checkAuth called");
+
     const token = req.cookies.token;
     if (!token) return res.status(401).json({ authenticated: false });
 

@@ -38,9 +38,7 @@ function simulateSemanticPlagiarismCheck(filePath, fileType, fileContent) {
 
     py.on('close', (code) => {
       if (code !== 0) {
-        return reject(
-          new Error(`Python exited with code ${code}: ${errorOutput.trim()}`)
-        );
+        return reject(new Error(`Python exited with code ${code}: ${errorOutput.trim()}`));
       }
       try {
         resolve(JSON.parse(output));
@@ -59,27 +57,35 @@ const checkPlagiarism = async (req, res) => {
   try {
     const { path: filePath, mimetype: fileType, originalname } = req.file;
     const fileContent = await extractTextFromFile(filePath, fileType);
-    const result = await simulateSemanticPlagiarismCheck(
-      filePath,
-      fileType,
-      fileContent
+
+    // ✅ Validate question bank structure
+    const questionIndicators = [
+      "What", "Why", "How", "When", "Where", "Who",
+      "Which", "Whom", "Whose", "Q:", "Q.", "?", "A.", "B.", "C.", "D:"
+    ];
+
+    const hasQuestionContent = questionIndicators.some(word =>
+      fileContent.includes(word)
     );
 
-    // 1) Save history and capture the returned record
+    if (!hasQuestionContent) {
+      return res.status(400).json({ message: 'Uploaded file does not appear to be a question bank.' });
+    }
+
+    const result = await simulateSemanticPlagiarismCheck(filePath, fileType, fileContent);
+
     const record = await PlagiarismHistory.create({
       userId: req.user.id,
       fileName: originalname,
       plagiarismPercentage: result.percentage,
     });
 
-    // 2) Log the action using record.id
     await UserLog.create({
       userId: req.user.id,
       action: 'file_check',
       metadata: { historyId: record.id },
     });
 
-    // 3) Return JSON using record.createdAt
     return res.json({
       fileName: originalname,
       date: record.createdAt,
@@ -90,9 +96,7 @@ const checkPlagiarism = async (req, res) => {
     });
   } catch (err) {
     console.error('Plagiarism check failed:', err);
-    return res
-      .status(500)
-      .json({ message: 'Error during check', error: err.message });
+    return res.status(500).json({ message: 'Error during check', error: err.message });
   }
 };
 

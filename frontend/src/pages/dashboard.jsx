@@ -53,9 +53,9 @@ export default function Dashboard() {
 
   useEffect(() => {
     const fetchStats = async () => {
+     
       try {
         const { data = {} } = await axios.get("http://localhost:7000/stats", {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
           withCredentials: true,
         });
 
@@ -88,7 +88,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-indigo-100 via-purple-100 to-pink-100 px-6 py-16">
-      {/* Header */}
+
       <div className="max-w-7xl mx-auto text-center mb-12">
         <h1 className="text-5xl font-extrabold text-gray-800 drop-shadow-lg">
           Welcome Back
@@ -123,7 +123,6 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* Recent Checks Table */}
       <div className="max-w-7xl mx-auto mb-16">
         <h2 className="text-3xl font-semibold text-gray-800 mb-6">Recent Checks</h2>
         {stats.recentChecks.length === 0 ? (

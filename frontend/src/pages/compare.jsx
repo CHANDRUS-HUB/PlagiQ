@@ -12,9 +12,12 @@ export default function Compare() {
   const [error, setError] = useState("");
   const [keyA, setKeyA] = useState(0);
   const [keyB, setKeyB] = useState(0);
-  
+
   const handleCompare = async () => {
-    if (!fileA || !fileB) return;
+    if (!fileA || !fileB) {
+      setError("Please upload both files.");
+      return;
+    }
 
     if (fileA.name === fileB.name && fileA.lastModified === fileB.lastModified) {
       setError("Please upload two different files for comparison.");
@@ -38,10 +41,14 @@ export default function Compare() {
       });
 
       const similarity = response.data.similarity;
-    setResult(similarity);
+      setResult(similarity);
     } catch (err) {
       console.error("Comparison failed:", err);
-      setError("Failed to compare files.");
+      if (err.response && err.response.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError("Failed to compare files.");
+      }
     } finally {
       setLoading(false);
     }
@@ -53,8 +60,8 @@ export default function Compare() {
     setResult(null);
     setError("");
     setLoading(false);
-    setKeyA(0);
-    setKeyB(0);
+    setKeyA(prev => prev + 1);
+    setKeyB(prev => prev + 1);
   };
 
   return (
@@ -63,8 +70,8 @@ export default function Compare() {
         Question File Comparison
       </h1>
 
-      <div className="flex flex-col gap-[0%] md:flex-row gap-[12px] justify-center items-start mb-14">
-      <FileUploader key={keyA} label="Upload File A" onUpload={setFileA} closeOnUpload />
+      <div className="flex flex-col md:flex-row gap-4 justify-center items-start mb-10">
+        <FileUploader key={keyA} label="Upload File A" onUpload={setFileA} closeOnUpload />
         <FileUploader key={keyB} label="Upload File B" onUpload={setFileB} closeOnUpload />
       </div>
 
@@ -96,7 +103,7 @@ export default function Compare() {
         </button>
       </div>
 
-      {error && <p className="text-red-600 mt-4 text-center">{error}</p>}
+      {error && <p className="text-red-600 mt-4 text-center font-semibold">{error}</p>}
 
       {result !== null && (
         <div className="mt-12">

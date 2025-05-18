@@ -1,30 +1,20 @@
-import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
+import { useAuth } from "./Authcontext"; // adjust path as needed
 
 export default function ProtectedUserRoute({ children }) {
-  const [loading, setLoading] = useState(true);
-  const [isAllowed, setIsAllowed] = useState(false);
+  const { isAuthenticated, userRole, isLoading } = useAuth();
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await fetch("http://localhost:7000/check-auth", {
-          credentials: "include",
-        });
-        const data = await res.json();
-        if (data.authenticated && data.user?.role === "user") {
-          setIsAllowed(true);
-        }
-      } catch (err) {
-        console.error("User route auth error", err);
-      }
-      setLoading(false);
-    };
+  if (isLoading) {
+    return <div>Loading...</div>; 
+  }
 
-    checkAuth();
-  }, []);
+  if (isAuthenticated === false) {
+    return <Navigate to="/signin" replace />;
+  }
 
-  if (loading) return <div className="p-4">Loading...</div>;
+  if (userRole !== "user") {
+    return <Navigate to="/signin" replace />;
+  }
 
-  return isAllowed ? children : <Navigate to="/signin" replace />;
+  return children;
 }
